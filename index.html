@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SermonFlow｜講道協調 MVP v0.2.1</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172b3a;background:#f3f6fa;--navy:#17324d;--blue:#2b72ad;--line:#dce4ed;--muted:#617387;--green:#16794b;--amber:#9a6200;--red:#b42318}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:white;color:#17324d;border-radius:9px;padding:9px 12px;font-weight:650}button.primary{background:var(--blue);border-color:var(--blue);color:white}button.danger{color:var(--red)}button.small{padding:6px 9px;font-size:.88rem}
+header{background:var(--navy);color:white;padding:22px max(18px,calc((100% - 1200px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font-size:1.5rem;margin:0 0 5px}header p{margin:0;color:#d7e4f1;font-size:.92rem}.tag{border:1px solid #7593ae;border-radius:999px;padding:6px 10px;font-size:.8rem}
+main{max-width:1200px;margin:22px auto;padding:0 16px 42px}.notice{background:#fff8e7;border:1px solid #f0d89c;color:#674b12;padding:12px 14px;border-radius:12px;margin-bottom:16px;font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}.stat,.panel{background:white;border:1px solid var(--line);border-radius:14px}.stat{padding:15px}.stat span{display:block;color:var(--muted);font-size:.85rem}.stat strong{display:block;font-size:1.8rem;margin-top:5px}.layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:16px;align-items:start}.panel{padding:16px}.panel h2{font-size:1.08rem;margin:0 0 14px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:160px}.field,input,select,textarea{width:100%;border:1px solid #cbd6e2;border-radius:8px;padding:9px 10px;background:white;color:#172b3a}.field label{display:block;font-size:.85rem;color:#40566c;font-weight:650;margin-bottom:5px}.field{border:0;padding:0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fields .wide{grid-column:1/-1}.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.list{display:grid;gap:9px}.item{border:1px solid var(--line);border-radius:11px;padding:12px;display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:start}.item.selected{border-color:var(--blue);box-shadow:0 0 0 2px #2b72ad18}.datebox{background:#eef4f9;border-radius:8px;padding:8px 4px;text-align:center;font-weight:750}.datebox small{display:block;color:var(--muted);font-weight:500}.item h3{font-size:.98rem;margin:0 0 4px}.sub{font-size:.85rem;color:var(--muted);line-height:1.5}.pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.pill{font-size:.75rem;border-radius:999px;padding:3px 7px;background:#eef2f6;color:#42566b}.pill.ok{background:#e5f5eb;color:var(--green)}.pill.wait{background:#fff2d6;color:var(--amber)}.pill.bad{background:#fde9e7;color:var(--red)}.taskline{display:flex;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid #edf1f5}.taskline:last-child{border-bottom:0}.taskline input[type=checkbox]{width:18px;height:18px}.taskline .tasktext{flex:1}.taskline small{display:block;color:var(--muted);margin-top:2px}.empty{padding:25px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}.muted{color:var(--muted);font-size:.85rem}.section-title{display:flex;justify-content:space-between;align-items:center;gap:8px}.section-title h2{margin-bottom:0}.section-title{margin-bottom:14px}.hidden{display:none!important}.footer-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.filelabel{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:white;border-radius:9px;padding:9px 12px;font-weight:650;cursor:pointer}.filelabel input{display:none}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#17324d;color:white;padding:11px 16px;border-radius:10px;box-shadow:0 6px 24px #0002;z-index:10;max-width:90vw}.privacy{font-size:.8rem;color:var(--muted);line-height:1.55;margin-top:14px}
+a.pill{text-decoration:none;background:#e6f0fa;color:var(--blue)}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:500px){.fields{grid-template-columns:1fr}.fields .wide{grid-column:auto}.item{grid-template-columns:58px 1fr}.item .itemactions{grid-column:2;display:flex;gap:6px}.stat strong{font-size:1.5rem}header{padding:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>SermonFlow</h1><p>講道協調中心 · 單教會、三語堂會 MVP</p></div>
+  <span class="tag">本機資料版 · v0.2.1</span>
+</header>
+<main>
+  <div class="notice"><strong>資料儲存提醒：</strong>資料僅存在目前瀏覽器的本機儲存空間 (localStorage)，不會跨裝置同步。請務必定期使用下方「匯出備份 JSON」功能備份資料。若是從網頁連結開啟，下載可能被瀏覽器擋住，請改用本機 .html 檔案開啟。</div>
+  <section class="stats" aria-label="統計">
+    <div class="stat"><span>未來場次</span><strong id="statTotal">0</strong></div>
+    <div class="stat"><span>待確認講員</span><strong id="statSpeakers">0</strong></div>
+    <div class="stat"><span>需更換講員</span><strong id="statSwap">0</strong></div>
+    <div class="stat"><span>缺少題目／經文</span><strong id="statContent">0</strong></div>
+    <div class="stat"><span>未完成部門任務</span><strong id="statTasks">0</strong></div>
+    <div class="stat"><span>逾期事項</span><strong id="statOverdue">0</strong></div>
+    <div class="stat"><span>未來 8 週場次</span><strong id="statWeeks">0</strong></div>
+  </section>
+  <div class="layout">
+    <section class="panel">
+      <div class="section-title"><h2>講道場次</h2><button class="primary" id="newBtn">＋ 新增場次</button></div>
+      <div class="toolbar">
+        <input id="search" placeholder="搜尋講員、題目、經文…" aria-label="搜尋">
+        <select id="filterLanguage" aria-label="語言堂會">
+          <option value="">所有堂會</option><option>台語堂</option><option>華語堂</option><option>英文堂</option>
+        </select>
+        <select id="filterScope" aria-label="顯示範圍"><option value="upcoming">未來場次</option><option value="all">含過去場次</option><option value="archived">已封存</option></select>
+        <select id="filterStatus" aria-label="工作狀態">
+          <option value="">所有狀態</option><option value="speaker">講員待確認</option><option value="swap">需更換講員</option><option value="content">缺少資料</option><option value="tasks">部門待辦</option><option value="overdue">逾期事項</option>
+        </select>
+      </div>
+      <div id="sermonList" class="list"></div>
+      <div class="footer-tools">
+        <button id="exportBtn">匯出備份 JSON</button>
+        <label class="filelabel">匯入備份 JSON<input type="file" id="importFile" accept=".json,application/json"></label>
+        <button id="demoBtn">載入示範資料</button><button id="clearBtn" class="danger small">清除全部資料</button>
+      </div>
+      <p class="privacy">提示：匯入備份會以備份內容取代目前清單。清除資料前請先匯出備份。</p>
+    </section>
+    <section class="panel">
+      <div class="section-title"><h2 id="formHeading">新增講道場次</h2><span class="muted">＊為必填</span></div>
+      <form id="sermonForm">
+        <input type="hidden" id="recordId">
+        <div class="fields">
+          <div class="field"><label for="date">講道日期 *</label><input id="date" type="date" required></div>
+          <div class="field"><label for="time">聚會時間 *</label><input id="time" type="time" value="09:30" required></div>
+          <div class="field"><label for="language">堂會 *</label><select id="language" required><option>華語堂</option><option>台語堂</option><option>英文堂</option></select></div>
+          <div class="field"><label for="speaker">講員 *</label><input id="speaker" required placeholder="姓名／稱呼"></div>
+          <div class="field"><label for="speakerType">講員類型</label><select id="speakerType"><option>內部講員</option><option>主任牧師</option><option>外部講員</option></select></div>
+          <div class="field"><label for="inviteStatus">邀請狀態</label><select id="inviteStatus"><option>待邀請</option><option>已邀請待回覆</option><option>已確認</option><option>婉拒</option><option>需更換講員</option></select></div>
+          <div class="field wide"><label for="title">講道題目</label><input id="title" placeholder="尚未確定時可以留白"></div>
+          <div class="field wide"><label for="scripture">聖經經文</label><input id="scripture" placeholder="例如：馬太福音 11:28–30"></div>
+          <div class="field"><label for="contentDue">題目／經文期限</label><input id="contentDue" type="date"></div>
+          <div class="field"><label for="slidesDue">投影片期限</label><input id="slidesDue" type="date"></div>
+          <div class="field wide"><label for="slidesUrl">投影片／資料連結</label><input id="slidesUrl" type="url" placeholder="https://…（可留白）"></div>
+          <div class="field wide"><label for="notes">備註</label><textarea id="notes" rows="2" placeholder="例如：外部講員交通安排、講道語言需求"></textarea></div>
+        </div>
+        <h3 style="font-size:.98rem;margin:18px 0 4px">部門交付追蹤</h3>
+        <p class="muted">完成狀態代表該部門已確認完成，不只代表已收到檔案。</p>
+        <div class="fields">
+          <div class="field"><label for="worshipStatus">敬拜部</label><select id="worshipStatus"><option>待開始</option><option>準備中</option><option>待確認</option><option>已完成</option></select></div>
+          <div class="field"><label for="itStatus">資訊部</label><select id="itStatus"><option>待開始</option><option>準備中</option><option>待確認</option><option>已完成</option></select></div>
+          <div class="field"><label for="worshipDue">敬拜部期限</label><input id="worshipDue" type="date"></div>
+          <div class="field"><label for="itDue">資訊部期限</label><input id="itDue" type="date"></div>
+        </div>
+        <div class="form-actions"><button type="submit" class="primary">儲存場次</button><button type="button" id="resetBtn">取消／清空表單</button><button type="button" id="deleteBtn" class="danger hidden">封存此場次</button><button type="button" id="restoreBtn" class="hidden">還原場次</button><button type="button" id="purgeBtn" class="danger hidden">永久刪除</button></div>
+      </form>
+    </section>
+  </div>
+  <p class="privacy">版本範圍：單一瀏覽器、本機資料、單人操作。此版為離線展示修復版，未提供登入、多使用者即時同步或雲端備份。</p>
+</main>
+<div id="toast" class="toast hidden" role="status"></div>
+<script>
+(() => {
+  const KEY = "sermonflow_mvp_v01", LEGACY_KEY = "sermonflow_mvp_v021";
+  const $ = id => document.getElementById(id);
+  const fields = ["date","time","language","speaker","speakerType","inviteStatus","title","scripture","contentDue","slidesDue","slidesUrl","notes","worshipStatus","itStatus","worshipDue","itDue"];
+  let records = [];
+  const E={lang:["華語堂","台語堂","英文堂"],type:["內部講員","主任牧師","外部講員"],invite:["待邀請","已邀請待回覆","已確認","婉拒","需更換講員"],task:["待開始","準備中","待確認","已完成"]};
+  const dateOk=v=>v===""||/^\d{4}-\d{2}-\d{2}$/.test(v);
+  const safeUrl=u=>/^https?:\/\/\S+$/i.test(u||"");
+  const live=r=>!r.archived;
+  let toastTimer;
+
+  function toast(msg){$("toast").textContent=msg;$("toast").classList.remove("hidden");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+  function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+  function norm(r){const o={};fields.forEach(k=>o[k]=String(r[k]??""));o.id=String(r.id);o.archived=r.archived===true;o.inviteStatus=o.inviteStatus||"待邀請";o.worshipStatus=o.worshipStatus||"待開始";o.itStatus=o.itStatus||"待開始";o.speakerType=o.speakerType||"內部講員";o.time=o.time||"09:30";return o}
+  function commit(fn,msg){const snap=JSON.stringify(records);fn();if(save()){resetForm();render();toast(msg)}else{records=JSON.parse(snap);render()}}
+  function load(){
+    try{const raw=localStorage.getItem(KEY)??localStorage.getItem(LEGACY_KEY);const arr=raw?JSON.parse(raw):[];if(!Array.isArray(arr))throw new Error("format");records=arr.filter(r=>r&&typeof r==="object"&&r.id&&/^\d{4}-\d{2}-\d{2}$/.test(r.date||"")).map(norm);if(records.length<arr.length)toast(`有 ${arr.length-records.length} 筆損壞資料已略過`)}
+    catch(e){records=[];toast("讀取本機資料失敗，請檢查瀏覽器儲存設定。")}
+  }
+
+  function save(){
+    try {
+      localStorage.setItem(KEY,JSON.stringify(records));
+      renderStats();
+      return true;
+    } catch(e) {
+      toast("儲存失敗：瀏覽器儲存空間可能不足或隱私設定阻擋。");
+      return false;
+    }
+  }
+
+  function dateText(d){if(!d)return "未設定";const p=d.split("-");return p.length===3?`${p[1]}/${p[2]}`:d}
+  function missingContent(r){return !r.title.trim()||!r.scripture.trim()}
+  function openTasks(r){return [r.worshipStatus,r.itStatus].filter(x=>x!=="已完成").length}
+
+  function overdues(r){
+    const t=today(),o=[];if(r.date<t)return o;
+    if(r.contentDue&&r.contentDue<t&&missingContent(r))o.push("題目／經文逾期");
+    if(r.slidesDue&&r.slidesDue<t&&!safeUrl(r.slidesUrl))o.push("投影片逾期");
+    if(r.worshipDue&&r.worshipDue<t&&r.worshipStatus!=="已完成")o.push("敬拜部逾期");
+    if(r.itDue&&r.itDue<t&&r.itStatus!=="已完成")o.push("資訊部逾期");
+    return o
+  }
+
+  const upcoming=r=>live(r)&&r.date>=today();
+  function pill(text,kind=""){return `<span class="pill ${kind}">${escapeHTML(text)}</span>`}
+
+  function renderStats(){
+    const up=records.filter(upcoming);
+    $("statTotal").textContent=up.length;
+    $("statSpeakers").textContent=up.filter(r=>["待邀請","已邀請待回覆"].includes(r.inviteStatus)).length;$("statSwap").textContent=up.filter(r=>["婉拒","需更換講員"].includes(r.inviteStatus)).length;
+    $("statContent").textContent=up.filter(missingContent).length;
+    $("statTasks").textContent=up.reduce((n,r)=>n+openTasks(r),0);
+    $("statOverdue").textContent=up.reduce((n,r)=>n+overdues(r).length,0);
+    $("statWeeks").textContent=up.filter(r=>r.date<=addDays(today(),56)).length;
+  }
+
+  function renderList(){
+    const q=$("search").value.trim().toLowerCase(), lang=$("filterLanguage").value, status=$("filterStatus").value;
+    const sorted=[...records].sort((a,b)=>(a.date||"").localeCompare(b.date||"")||(a.time||"").localeCompare(b.time||""));
+    const scope=$("filterScope").value;
+
+    const list=sorted.filter(r=>{
+      if(scope==="archived"?live(r):!live(r))return false;
+      if(scope==="upcoming"&&r.date<today())return false;
+      const text=[r.speaker,r.speakerType,r.title,r.scripture,r.language,r.notes].join(" ").toLowerCase();
+      if(q&&!text.includes(q))return false;
+      if(lang&&r.language!==lang)return false;
+      if(status==="speaker"&&!["待邀請","已邀請待回覆"].includes(r.inviteStatus))return false;if(status==="swap"&&!["婉拒","需更換講員"].includes(r.inviteStatus))return false;
+      if(status==="content"&&!missingContent(r))return false;
+      if(status==="tasks"&&openTasks(r)===0)return false;
+      if(status==="overdue"&&!overdues(r).length)return false;
+      return true;
+    });
+
+    $("sermonList").innerHTML=list.length?list.map(r=>{
+      const active=r.id===$("recordId").value;
+      const dueLabels=overdues(r).map(x=>pill(x,"bad"));
+      if(r.archived)dueLabels.push(pill("已封存"));
+      if(safeUrl(r.slidesUrl))dueLabels.push(`<a class="pill" href="${escapeHTML(r.slidesUrl)}" target="_blank" rel="noopener noreferrer">投影片連結</a>`);
+
+      return `<article class="item ${active?"selected":""}">
+        <div class="datebox">${escapeHTML(dateText(r.date))}<small>${escapeHTML(r.time||"")}</small></div>
+        <div><h3>${escapeHTML(r.title||"（題目待確認）")}</h3><div class="sub">${escapeHTML(r.language)} · ${escapeHTML(r.speaker)}<br>${escapeHTML(r.scripture||"經文待確認")}</div><div class="pills">${pill(r.inviteStatus,r.inviteStatus==="已確認"?"ok":["婉拒","需更換講員"].includes(r.inviteStatus)?"bad":"wait")}${missingContent(r)?pill("資料未完整","bad"):""}${openTasks(r)?pill(`部門待辦 ${openTasks(r)}`,"wait"):pill("部門完成","ok")}${dueLabels.join("")}</div></div>
+        <div class="itemactions"><button class="small" data-edit="${escapeHTML(r.id)}">編輯</button></div>
+      </article>`;
+    }).join(""):`<div class="empty">沒有符合條件的場次。<br><span class="muted">可新增場次，或調整搜尋與篩選條件。</span></div>`;
+
+    $("sermonList").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editRecord(b.dataset.edit)));
+  }
+
+  function today(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Taipei"}).format(new Date())}
+  function addDays(s,n){const d=new Date(s+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+  function render(){renderStats();renderList()}
+
+  function resetForm(){
+    $("sermonForm").reset();$("recordId").value="";$("time").value="09:30";$("language").value="華語堂";
+    $("speakerType").value="內部講員";$("inviteStatus").value="待邀請";$("worshipStatus").value="待開始";$("itStatus").value="待開始";
+    $("formHeading").textContent="新增講道場次";["deleteBtn","restoreBtn","purgeBtn"].forEach(i=>$(i).classList.add("hidden"));renderList();
+  }
+
+  function editRecord(id){
+    const r=records.find(x=>x.id===id);if(!r)return;
+    $("recordId").value=r.id;fields.forEach(k=>{if($(k))$(k).value=r[k]??""});
+    $("formHeading").textContent="修改講道場次";
+    $("deleteBtn").classList.toggle("hidden",!!r.archived);
+    ["restoreBtn","purgeBtn"].forEach(i=>$(i).classList.toggle("hidden",!r.archived));
+    renderList();
+    if(window.innerWidth<850)$("sermonForm").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  $("sermonForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    const id=$("recordId").value||((crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now()));
+    const obj={id};fields.forEach(k=>obj[k]=$(k).value.trim());
+
+    if(!obj.date||!obj.time||!obj.language||!obj.speaker){toast("請填妥日期、時間、堂會與講員。");return}
+    if(!dateOk(obj.date)){toast("講道日期格式無效。");return}
+    if(obj.slidesUrl&&!safeUrl(obj.slidesUrl)){toast("投影片連結需以 http:// 或 https:// 開頭。");return}
+    if(obj.itStatus==="已完成"&&!safeUrl(obj.slidesUrl)&&!confirm("資訊部標示已完成，但尚未填寫投影片連結。仍要儲存嗎？"))return;
+    if(obj.worshipStatus==="已完成"&&(!obj.title||!obj.scripture)&&!confirm("敬拜部標示已完成，但題目或經文仍缺漏。仍要儲存嗎？"))return;
+
+    const duplicate=records.find(r=>live(r)&&r.id!==id&&r.date===obj.date&&r.time===obj.time&&(r.language===obj.language||r.speaker.toLowerCase()===obj.speaker.toLowerCase()));
+    if(duplicate&&!confirm("相同日期與時間，已有同堂會或同一講員的場次。仍要儲存嗎？"))return;
+
+    const idx=records.findIndex(r=>r.id===id);
+    const originalRecords = [...records];
+
+    if(idx>=0){obj.archived=!!records[idx].archived;records[idx]=obj}else{obj.archived=false;records.push(obj)}
+
+    if(save()){
+      resetForm();render();toast(idx>=0?"場次已更新。":"場次已新增並儲存在此瀏覽器。");
+    } else {
+      records = originalRecords;
+    }
+  });
+
+  $("newBtn").addEventListener("click",()=>{resetForm();$("date").value=today();$("sermonForm").scrollIntoView({behavior:"smooth",block:"start"})});
+  $("resetBtn").addEventListener("click",resetForm);
+  $("restoreBtn").addEventListener("click",()=>{const r=records.find(x=>x.id===$("recordId").value);if(!r)return;commit(()=>{r.archived=false},"場次已還原。")});
+  $("purgeBtn").addEventListener("click",()=>{const id=$("recordId").value;if(!id||!confirm("永久刪除此已封存場次？無法復原。建議先匯出備份。"))return;commit(()=>{records=records.filter(x=>x.id!==id)},"場次已永久刪除。")});
+
+  $("demoBtn").addEventListener("click",()=>{
+    if(records.length&&!confirm("將在現有資料之外加入 5 筆示範場次（虛構內容，備註標示「示範資料」）。繼續嗎？"))return;
+    const snapDemo=JSON.stringify(records),t=today(),d=n=>addDays(t,n);
+    const mk=(n,o)=>({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()+n),date:d(n),time:"09:30",speakerType:"內部講員",inviteStatus:"待邀請",title:"",scripture:"",contentDue:"",slidesDue:"",slidesUrl:"",notes:"示範資料",worshipStatus:"待開始",itStatus:"待開始",worshipDue:"",itDue:"",archived:false,...o});
+    records.push(
+      mk(3,{language:"華語堂",speaker:"範例牧師甲",speakerType:"主任牧師",inviteStatus:"已確認",title:"安息的應許",scripture:"希伯來書 4:1–11",contentDue:d(-2),slidesDue:d(1),itDue:d(2)}),
+      mk(10,{language:"台語堂",speaker:"範例講員乙",inviteStatus:"已邀請待回覆",contentDue:d(-1)}),
+      mk(17,{language:"英文堂",speaker:"範例講員丙",speakerType:"外部講員",inviteStatus:"已確認",title:"Grace Upon Grace",scripture:"John 1:14–18",slidesDue:d(-3),worshipStatus:"已完成",itStatus:"準備中",itDue:d(-1)}),
+      mk(24,{language:"華語堂",speaker:"範例講員丁",speakerType:"外部講員",inviteStatus:"婉拒"}),
+      mk(38,{language:"台語堂",speaker:"範例講員戊",inviteStatus:"已確認",title:"同行的恩典",scripture:"詩篇 23",slidesUrl:"https://example.com/slides",worshipStatus:"已完成",itStatus:"已完成"})
+    );
+    if(save()){render();toast("已加入 5 筆示範場次。")}else{records=JSON.parse(snapDemo);render()}
+  });
+
+  $("deleteBtn").addEventListener("click",()=>{
+    const id=$("recordId").value;if(!id)return;
+    const r=records.find(x=>x.id===id);if(!r||!confirm(`封存「${r.title||r.speaker}」？封存後不計入統計，可隨時還原。`))return;
+    commit(()=>{r.archived=true},"場次已封存，可在「已封存」還原。");
+  });
+
+  ["search","filterLanguage","filterScope","filterStatus"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",renderList));
+
+  $("exportBtn").addEventListener("click",()=>{
+    const blob=new Blob([JSON.stringify({app:"SermonFlow",version:2.1,exportedAt:new Date().toISOString(),records},null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`sermonflow-backup-${today()}.json`;a.click();URL.revokeObjectURL(url);toast("備份檔已匯出。");
+  });
+
+$("importFile").addEventListener("change",async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const parsed=JSON.parse(await file.text());const incoming=Array.isArray(parsed)?parsed:parsed.records;
+
+      const bad=r=>!r||typeof r!=="object"||!r.id||!/^\d{4}-\d{2}-\d{2}$/.test(r.date||"")||!E.lang.includes(r.language)||!r.speaker||(r.inviteStatus&&!E.invite.includes(r.inviteStatus))||(r.speakerType&&!E.type.includes(r.speakerType))||[r.worshipStatus,r.itStatus].some(x=>x&&!E.task.includes(x))||["contentDue","slidesDue","worshipDue","itDue"].some(k=>!dateOk(String(r[k]??"")))||(r.slidesUrl&&!safeUrl(r.slidesUrl));
+      if(!Array.isArray(incoming)||incoming.some(bad)){
+         throw new Error("Data validation failed.");
+      }
+
+      // 檢查 ID 重複性，若 ID 有重複則拒絕匯入
+      const uniqueIds = new Set(incoming.map(r=>r.id));
+      if (uniqueIds.size !== incoming.length) {
+         throw new Error("Duplicate IDs found in backup.");
+      }
+
+      if(!confirm(`將以備份中的 ${incoming.length} 筆場次取代目前 ${records.length} 筆資料。建議先匯出目前備份。繼續嗎？`))return;
+
+      const originalRecords = [...records];
+      records=incoming.map(norm);
+
+      if(save()){
+         resetForm();render();toast("備份已安全匯入。");
+      } else {
+         records = originalRecords;
+         toast("匯入失敗：無法寫入本機儲存空間。");
+      }
+    }catch(err){
+      toast("無法匯入：檔案格式不正確、存在重複紀錄或缺少必要欄位。");
+    }
+    finally{e.target.value=""}
+  });
+
+  $("clearBtn").addEventListener("click",()=>{
+    if(!confirm("確定清除本瀏覽器內的所有 SermonFlow 資料？此動作無法復原。請先匯出備份。"))return;
+    commit(()=>{records=[]},"本機資料已清除。");
+  });
+
+  load();render();resetForm();
+})();
+</script>
+</body>
+</html>
